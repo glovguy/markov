@@ -1,5 +1,5 @@
 import random
-from language_helper import stack_transition
+from ..helpers.language_helper import stack_transition, stringify
 
 
 # ( 1st-gram, 2nd-gram, dep-level )

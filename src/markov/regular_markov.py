@@ -1,4 +1,5 @@
 import random
+from ..helpers.language_helper import stringify
 
 
 def build_chain(doc, chain = {}):
