@@ -1,10 +1,12 @@
-from sentence import is_full_sentence, parse_complexity, closing_punct
-from stack_markov import *
+import spacy
+from src.helpers.language_helper import is_full_sentence, parse_complexity, closing_punct
+from src.markov.stack_markov import *
+from data.pickles import unpickle
 
 
-plato = build_chain(read_file('corpora/apology.txt'))
-plato = build_chain(read_file('corpora/republic.txt'), plato)
-plato = build_chain(read_file('corpora/symposium.txt'), plato)
+nlp = spacy.load('en_core_web_sm')
+plato = unpickle('data/pickles/plato_stack_chain.pkl')
+
 
 def sentence_filter(sent):
     if not is_full_sentence(sent):

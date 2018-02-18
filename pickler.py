@@ -7,7 +7,6 @@ nlp = spacy.load('en_core_web_sm')
 def read_file(filename):
     with open(filename, "r") as file:
         raw_text = file.read()
-        len(raw_text)
         contents = nlp(raw_text)
     return contents
 
@@ -32,4 +31,4 @@ stack_chain = stack_markov.build_chain(republic, stack_chain)
 stack_chain = stack_markov.build_chain(apology, stack_chain)
 
 with open('data/pickles/plato_stack_chain.pkl', 'wb') as myf:
-    pickle.dump(regular_chain, myf)
+    pickle.dump(stack_chain, myf)
