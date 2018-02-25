@@ -65,3 +65,22 @@ def closing_punct(sent):
 
 def parse_complexity(span):
     return len(set([parse_stack(t)[0] for t in span]))
+
+
+def add_symbol_balance(doc):
+    balance_points = []
+    symbol_hash = {}
+    quote_hash = {}
+    for t in doc:
+        print(t)
+        if t.is_left_punct and not t.is_quote:
+            symbol_hash[t.orth] = t.i
+        elif t.is_right_punct and not t.is_quote:
+            symbol = sorted(symbol_hash, key=lambda entry: symbol_hash[entry], reverse=True)[0]
+            balance_points.append( (t.orth_, symbol_hash[symbol], t.i) )
+            symbol_hash[symbol] = None
+        elif t.is_quote and not quote_hash.get(t.orth):
+            quote_hash[t.orth] = t.i
+        elif t.is_quote and quote_hash.get(t.orth):
+            balance_points.append( (t.orth_, quote_hash[t.orth], t.i) )
+    doc.user_data['balance_points'] = balance_points
