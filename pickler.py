@@ -2,6 +2,7 @@ import pickle
 import spacy
 from src.markov import stack_markov, regular_markov
 
+
 nlp = spacy.load('en_core_web_sm')
 
 def read_file(filename):

@@ -1,6 +1,23 @@
 import random
-from ..helpers.language_helper import stack_transition, stringify
+from src.helpers.language_helper import stringify, add_symbol_balance, parse_stack, symbol_stack
 
+
+def stack_label(token):
+    prefix = symbol_label(token)
+    suffix = parse_label(token)
+    if prefix is not '':
+        label = prefix + '_' + suffix
+    else:
+        label = suffix
+    return label
+
+
+def parse_label(token):
+    return parse_stack(token)[:1][0]
+
+
+def symbol_label(token):
+    return ''.join(symbol_stack(token))
 
 # ( 1st-gram, 2nd-gram, dep-level )
 #               |
@@ -8,11 +25,12 @@ from ..helpers.language_helper import stack_transition, stringify
 #      ( 1-gram, dep_level )
 
 def build_chain(doc, chain = {}):
+    add_symbol_balance(doc)
     index = 2
     doc_wo_spaces = [w for w in doc if not w.is_space]
     for word in doc_wo_spaces[index:]:
-        key = (stringify(doc_wo_spaces[index-2]), stringify(doc_wo_spaces[index-1]), stack_transition(doc_wo_spaces[index-1]))
-        value = (stringify(word), stack_transition(word))
+        key = (stringify(doc_wo_spaces[index-2]), stringify(doc_wo_spaces[index-1]), stack_label(doc_wo_spaces[index-1]))
+        value = (stringify(word), stack_label(word))
         if key in chain:
             chain[key].append(value)
         else:
@@ -23,7 +41,7 @@ def build_chain(doc, chain = {}):
 
 def generate_message(chain, count = 100):
     starting_place = random.choice(list(chain.keys()))
-    while not starting_place[0].isalpha() and not starting_place[1].isalpha():
+    while not starting_place[0].isalpha() and not starting_place[1].isalpha() and not '_' in starting_place[2]:
         starting_place = random.choice(list(chain.keys()))
     word1 = starting_place[0]
     word2 = starting_place[1]

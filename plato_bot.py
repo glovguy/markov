@@ -3,7 +3,6 @@ from src.helpers.language_helper import is_full_sentence, parse_complexity, clos
 from src.markov.stack_markov import *
 from data.pickles import unpickle
 
-
 nlp = spacy.load('en_core_web_sm')
 plato = unpickle('data/pickles/plato_stack_chain.pkl')
 

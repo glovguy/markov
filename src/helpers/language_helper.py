@@ -9,7 +9,7 @@ def stringify(token):
         return token.orth_
 
 
-def parse_stack(token): #should add balancing for parentheses, etc.
+def parse_stack(token):
     stack = []
     if token.n_lefts + token.n_rights > 0:
         stack.append(token.dep_)
@@ -22,25 +22,6 @@ def parse_stack(token): #should add balancing for parentheses, etc.
     if len(stack) == 0:
         return ['']
     return stack
-
-
-def stack_transition(token):
-    current_stack = parse_stack(token)
-    if len(current_stack[:1]) == 0: #THIS DOESN"T SEEM RIGHT
-        print(token)
-        print(token.i)
-    base_dep = current_stack[:1][0]
-    if token.is_sent_start or token.i == 0:
-        return 'in_' + base_dep
-    if token.i == len(token.doc)-1:
-        return 'out_' + base_dep
-    prev_stack = parse_stack(token.nbor(-1))
-    next_stack = parse_stack(token.nbor(1))
-    if len(prev_stack) < len(current_stack):
-        return 'in_' + base_dep
-    if len(current_stack) > len(next_stack):
-        return 'out_' + base_dep
-    return base_dep
 
 
 def is_full_sentence(span):
@@ -68,19 +49,37 @@ def parse_complexity(span):
 
 
 def add_symbol_balance(doc):
+    balance_points = _quote_balance(doc) #+ _punct_balance(doc)
+    doc.user_data['balance_points'] = balance_points
+    return doc
+
+
+def _quote_balance(doc):
     balance_points = []
-    symbol_hash = {}
     quote_hash = {}
     for t in doc:
-        print(t)
+        if t.is_quote and quote_hash.get(t.orth) is None:
+            quote_hash[t.orth] = t.i
+        elif t.is_quote and quote_hash.get(t.orth) is not None:
+            balance_points.append( (t.orth_, quote_hash[t.orth], t.i) )
+            quote_hash[t.orth] = None
+    return balance_points
+
+
+def _punct_balance(doc):
+    balance_points = []
+    symbol_hash = {}
+    for t in doc:
         if t.is_left_punct and not t.is_quote:
             symbol_hash[t.orth] = t.i
         elif t.is_right_punct and not t.is_quote:
             symbol = sorted(symbol_hash, key=lambda entry: symbol_hash[entry], reverse=True)[0]
             balance_points.append( (t.orth_, symbol_hash[symbol], t.i) )
             symbol_hash[symbol] = None
-        elif t.is_quote and not quote_hash.get(t.orth):
-            quote_hash[t.orth] = t.i
-        elif t.is_quote and quote_hash.get(t.orth):
-            balance_points.append( (t.orth_, quote_hash[t.orth], t.i) )
-    doc.user_data['balance_points'] = balance_points
+    return balance_points
+
+
+def symbol_stack(token):
+    balance_points = sorted(token.doc.user_data['balance_points'], key=lambda bal: bal[1], reverse=True)
+    ti = token.i
+    return [bal[0] for bal in balance_points if bal[1] <= ti and bal[2] >= ti]
