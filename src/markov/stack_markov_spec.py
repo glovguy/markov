@@ -17,13 +17,10 @@ class test_stack_labels(unittest.TestCase):
         self.assertEqual(symbol_label(doc[3]), '"')
         self.assertEqual(symbol_label(doc[12]), "'")
 
-    def test_symbol_label_includes_quote_mark(self):
+    def test_symbol_label_transition(self):
         doc = nlp("""\"Yes," he replied.""")
-        print(doc.user_data)
-        print(doc[0])
-        print(doc[3])
-        self.assertEqual(symbol_label(doc[0]), '"')
-        self.assertEqual(symbol_label(doc[3]), '"')
+        self.assertEqual(symbol_label(doc[0]), 'in_"')
+        self.assertEqual(symbol_label(doc[3]), 'out_"')
 
     def test_symbol_label_with_depth(self):
         doc = nlp("""He said "no reason to 'hate' on me like that!\"""")
@@ -47,9 +44,9 @@ class test_stack_label(unittest.TestCase):
     def test_stack_label_with_a_quote(self):
         doc = nlp("""I want to say, "I want coffee," but that should be obvious.""")
         self.assertEqual(stack_label(doc[0]), 'ROOT')
-        self.assertEqual(stack_label(doc[7]), '"_ccomp')
+        self.assertEqual(stack_label(doc[7]), '"__ccomp')
 
     def test_stack_label_with_quote_depth(self):
         doc = nlp("""They exclaimed, "no more 'coffee' quote!\"""")
-        self.assertEqual(stack_label(doc[6]), '\'"_nmod')
-        self.assertEqual(stack_label(doc[4]), '\"_amod')
+        self.assertEqual(stack_label(doc[7]), '\'"__nmod')
+        self.assertEqual(stack_label(doc[4]), '\"__amod')

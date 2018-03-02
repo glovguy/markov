@@ -1,8 +1,13 @@
 
 
 def stringify(token):
+    # doc_len = len(token.doc)
     if token.orth_ == 'I':
         return token.orth_
+    elif token.is_quote and token.i != 0 and token.nbor(-1).is_space:
+        return ' ' + token.orth_
+    # elif token.is_quote and token.i != len(token.doc)-1 and token.nbor(1).is_space:
+    #     return token.orth_ + ' '
     elif token.ent_type_ == '':
         return token.lower_
     else:
@@ -49,21 +54,31 @@ def parse_complexity(span):
 
 
 def add_symbol_balance(doc):
-    balance_points = _quote_balance(doc) #+ _punct_balance(doc)
+    balance_points = quote_balance(doc) #+ _punct_balance(doc)
     doc.user_data['balance_points'] = balance_points
     return doc
 
 
-def _quote_balance(doc):
+def quote_balance(doc):
     balance_points = []
     quote_hash = {}
     for t in doc:
         if t.is_quote and quote_hash.get(t.orth) is None:
             quote_hash[t.orth] = t.i
         elif t.is_quote and quote_hash.get(t.orth) is not None:
-            balance_points.append( (t.orth_, quote_hash[t.orth], t.i) )
-            quote_hash[t.orth] = None
+            if span_is_only_whitespace(doc[quote_hash[t.orth]+1:t.i]):
+                quote_hash[t.orth] = t.i
+            else:
+                balance_points.append( (t.orth_, quote_hash[t.orth], t.i) )
+                quote_hash[t.orth] = None
     return balance_points
+
+
+def span_is_only_whitespace(span):
+    for t in span:
+        if not t.is_space:
+            return False
+    return True
 
 
 def _punct_balance(doc):
