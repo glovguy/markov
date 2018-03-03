@@ -50,3 +50,18 @@ class test_stack_label(unittest.TestCase):
         doc = nlp("""They exclaimed, "no more 'coffee' quote!\"""")
         self.assertEqual(stack_label(doc[7]), '\'"__nmod')
         self.assertEqual(stack_label(doc[4]), '\"__amod')
+
+class test_is_valid_quote_mark(unittest.TestCase):
+    def test_invalid_quote(self):
+        token = nlp('One "two" three" four')[5]
+        all_quote_points = [1, 3]
+        self.assertEqual(is_valid_quote_mark(token, all_quote_points), False)
+
+    def test_valid_quotes(self):
+        doc = nlp('One "two" three" four')
+        add_symbol_balance(doc)
+        token1 = doc[1]
+        token2 = doc[3]
+        all_quote_points = [1, 3]
+        self.assertEqual(is_valid_quote_mark(token1, all_quote_points), True)
+        self.assertEqual(is_valid_quote_mark(token2, all_quote_points), True)

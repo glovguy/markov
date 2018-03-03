@@ -35,6 +35,14 @@ def _stack_transition_label(token):
             return 'out'
     return ''
 
+
+def is_valid_quote_mark(token, all_quote_points):
+    return not (token.is_quote and not token.i in all_quote_points)
+
+
+def all_quote_points(doc):
+    return [point for pair in doc.user_data['balance_points'] for point in pair[-2:]]
+
 # ( 1st-gram, 2nd-gram, dep-level )
 #               |
 #               V
@@ -43,7 +51,8 @@ def _stack_transition_label(token):
 def build_chain(doc, chain = {}):
     add_symbol_balance(doc)
     index = 2
-    doc_wo_spaces = [w for w in doc if not w.is_space]
+    quote_points = all_quote_points(doc)
+    doc_wo_spaces = [w for w in doc if not w.is_space and is_valid_quote_mark(w, quote_points)]
     for word in doc_wo_spaces[index:]:
         key = (stringify(doc_wo_spaces[index-2]), stringify(doc_wo_spaces[index-1]), stack_label(doc_wo_spaces[index-1]))
         value = (stringify(word), stack_label(word))
@@ -76,8 +85,7 @@ def generate_message(chain, count = 100):
             while not current_tuple[0].isalpha() and not '__' in current_tuple[-1]:
                 current_tuple = random.choice(list(chain.keys()))
         word3 = current_tuple[0]
-        print([prev_tuple, current_tuple])
-        if not word3.isalpha() and not word3.islower():
+        if not word3.isalpha() and not word3.islower() and not word3.isdigit():
             message += word3
         elif "out_'" in prev_tuple[-1] or 'in_"' in prev_tuple[-1]:
             message += word3
