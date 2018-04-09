@@ -17,7 +17,7 @@ def parse_label(token):
 
 
 def symbol_label(token):
-    prefix = _stack_transition_label(token)
+    prefix = symbol_label_prefix(token)
     suffix = ''.join(symbol_stack(token))
     if prefix is not '':
         return prefix + '_' + suffix
@@ -25,7 +25,7 @@ def symbol_label(token):
         return suffix
 
 
-def _stack_transition_label(token):
+def symbol_label_prefix(token):
     balance_points = sorted(token.doc.user_data['balance_points'], key=lambda bal: bal[1], reverse=True)
     ti = token.i
     for bal in balance_points:
@@ -74,7 +74,6 @@ def generate_message(chain, count = 100):
     message = word1.capitalize() + ' ' + word2
     prev_tuple = starting_place
     word3 = ''
-    print(prev_tuple)
     enditer = ''
 
     while len(message.split(' ')) < count or not (word3 == '.' or word3 == '!' or word3 == '?'):

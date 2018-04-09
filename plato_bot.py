@@ -19,7 +19,7 @@ def is_relevant(sent, keywords):
     if keywords:
         contains_keywords = False
         for w in keywords:
-            if w.text in sent.text:
+            if w.text.lower() in sent.text.lower():
                 contains_keywords = True
                 break
         if not contains_keywords:
@@ -30,11 +30,12 @@ while True:
     print('\n')
     input_message = nlp(input("Say something to Plato: "))
     input_keywords = [t for t in input_message if not t.is_stop]
+    input_complexity = parse_complexity(input_message)
 
     doc = nlp(generate_message(plato, 5000))
     sentences = sorted(
         [sent for sent in doc.sents if sentence_filter(sent)],
-        key=lambda sent: (is_relevant(sent, input_keywords), input_message.similarity(sent))
+        key=lambda sent: (is_relevant(sent, input_keywords))
         )
-    print('\n'.join([closing_punct(sent.text) for sent in sentences[:6]]))
+    print('\n'.join([closing_punct(sent.text) for sent in sentences[:input_complexity]]))
 

@@ -1,13 +1,10 @@
 
 
 def stringify(token):
-    # doc_len = len(token.doc)
     if token.orth_ == 'I':
         return token.orth_
     elif token.is_quote and token.i != 0 and token.nbor(-1).is_space:
         return ' ' + token.orth_
-    # elif token.is_quote and token.i != len(token.doc)-1 and token.nbor(1).is_space:
-    #     return token.orth_ + ' '
     elif token.ent_type_ == '':
         return token.lower_
     else:
@@ -44,7 +41,9 @@ def is_full_sentence(span):
 
 def closing_punct(sent):
     final_word = sent[-1:]
-    if not (final_word == '.' or final_word == '!' or final_word == '?'):
+    if len([q for q in sent if q == '"']) % 2 != 0:
+        sent += '"'
+    if not (final_word == '.' or final_word == '!' or final_word == '?' or final_word == '"' or final_word == "'"):
         return sent + '.'
     return sent
 
@@ -95,6 +94,8 @@ def _punct_balance(doc):
 
 
 def symbol_stack(token):
-    balance_points = sorted(token.doc.user_data['balance_points'], key=lambda bal: bal[1], reverse=True)
+    balance_points = sorted(
+        token.doc.user_data['balance_points'],
+        key=lambda bal: bal[1], reverse=True)
     ti = token.i
     return [bal[0] for bal in balance_points if bal[1] <= ti and bal[2] >= ti]
