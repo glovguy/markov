@@ -74,7 +74,6 @@ def generate_message(chain, count = 100):
     message = word1.capitalize() + ' ' + word2
     prev_tuple = starting_place
     word3 = ''
-    enditer = ''
 
     while len(message.split(' ')) < count or not (word3 == '.' or word3 == '!' or word3 == '?'):
         if chain.get(prev_tuple):
@@ -96,7 +95,7 @@ def generate_message(chain, count = 100):
             message += ' ' + word3
 
         prev_tuple = (prev_tuple[1], word3, current_tuple[1])
-        if len(message.split(' ')) > count+50 or enditer != '':
+        if len(message.split(' ')) > count+50:
             message += '.'
             break
 
