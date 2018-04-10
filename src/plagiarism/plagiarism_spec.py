@@ -72,6 +72,22 @@ class test_build_plagiarism_trie(unittest.TestCase):
         }
         self.assertEqual(result_trie, expected_trie)
 
+    def test_build_plagiarism_trie_skips_whitespace(self):
+        test_doc = nlp('''This is best.
+            This is the best outcome.''')
+        initial_trie = {'this': {'one': {'time': 'END'}}}
+        result_trie = build_plagiarism_trie(test_doc, initial_trie)
+        expected_trie = {
+            'this': {
+                'is': {
+                    'best': {'.': 'END'},
+                    'the': {'best': {'outcome': {'.': 'END'}}}
+                },
+                'one': {'time': 'END'}
+            }
+        }
+        self.assertEqual(result_trie, expected_trie)
+
     def test_is_sent_plagiarized(self):
         test_sent = next(nlp("I want coffee.").sents)
         test_trie = {
@@ -86,7 +102,7 @@ class test_build_plagiarism_trie(unittest.TestCase):
         result = is_sent_plagiarized(test_sent, test_trie)
         self.assertFalse(result)
 
-    def test_is_sent_plagiarized(self):
+    def test_is_sent_plagiarized_combines_properly(self):
         test_sent1 = next(nlp("This is the best outcome.").sents)
         test_sent2 = next(nlp("this one time").sents)
         test_trie = {
@@ -102,3 +118,17 @@ class test_build_plagiarism_trie(unittest.TestCase):
         result2 = is_sent_plagiarized(test_sent2, test_trie)
         self.assertTrue(result1)
         self.assertTrue(result2)
+
+    def test_is_sent_plagiarized_works_for_sentences_shorter(self):
+        short_sent = next(nlp("this one").sents)
+        test_trie = {
+            'this': {
+                'is': {
+                    'best': {'.': 'END'},
+                    'the': {'best': {'outcome': {'.': 'END'}}}
+                },
+                'one': {'time': 'END'}
+            }
+        }
+        result = is_sent_plagiarized(short_sent, test_trie)
+        self.assertFalse(result)

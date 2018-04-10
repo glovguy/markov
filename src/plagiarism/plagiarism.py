@@ -24,6 +24,7 @@ class EndIter(object):
 
 def words(sent):
     for word in sent:
+        if word.is_space: continue
         yield word
     yield EndIter()
 
@@ -31,7 +32,7 @@ def words(sent):
 def is_sent_plagiarized(sent, trie):
     subtrie = trie
     for word in sent:
-        subtrie = subtrie.get(word.norm_, 'GOOD')
-        if subtrie is 'GOOD': return False
-        if subtrie is 'END': return True
-    raise Exception
+        subtrie = subtrie.get(word.norm_)
+        if subtrie is None: return False
+        if subtrie == 'END': return True
+    return False
