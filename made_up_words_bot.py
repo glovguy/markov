@@ -1,11 +1,10 @@
 from src.made_up_words.made_up_words import *
 
 
-while True:
-    userWord = nlp(input('Word to be similar to: '))
-    goalVector = userWord.vector
+def generate_fake_word(goalVector, ignore=[]):
     # [print(x['letter'] + ': ', score(userWord, x)) for x in all_transitions['$']]
-    champion = find_next_transition('$$', 0, 0, goalVector)
+    firstLetterIgnores = [eachStr[0] for eachStr in ignore]
+    champion = find_next_transition('$$', 0, 0, goalVector, ignore=firstLetterIgnores)
     # print('letter: ', champion['letter'], 'mass: ', champion['mass'])
     ieration = 1
     currentVec = 0
@@ -25,4 +24,17 @@ while True:
         # print('letter: ', champion['letter'], 'mass: ', champion['mass'])
         ieration += 1
         sourceLetters = fakeWord[-2:]
-    print('new word: ', fakeWord[:-1])
+    fakeWord = fakeWord[:-1]
+    return fakeWord
+
+
+while True:
+    userWord = nlp(input('Word to be similar to: '))
+    goalVector = userWord.vector
+    fakeWord = generate_fake_word(goalVector)
+    ignoreStrs = []
+    while fakeWord in all_strings:
+        print('generated real word "{}", retrying...'.format(fakeWord))
+        ignoreStrs.append(fakeWord)
+        fakeWord = generate_fake_word(goalVector, ignoreStrs)
+    print('new word: ', fakeWord)

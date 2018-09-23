@@ -59,8 +59,9 @@ def score(goalVector, currentVec, currentTotal, destNode):
     return numpy.linalg.norm(vec-goalVector)
 
 
-def find_next_transition(sourceLetter, currentVec, currentTotal, goalVector):
+def find_next_transition(sourceLetter, currentVec, currentTotal, goalVector, ignore=[]):
+    possibleTransitions = [t for t in all_transitions[str.lower(sourceLetter)] if t['letter'] not in ignore]
     return min(
-        all_transitions[str.lower(sourceLetter)],
+        possibleTransitions,
         key=lambda n: score(goalVector, currentVec, currentTotal, n)
     )
