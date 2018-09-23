@@ -39,15 +39,15 @@ def build_transition(source, destLetter):
     add_vector_to_destination(matchDest, vec)
 
 
-for s in all_strings[2000:2110]:
-    source = '$'
+for s in all_strings[2000:2310]:
+    source = '$$'
     destLetter = s[0]
     build_transition(source, destLetter)
     for i in range(0, len(s)-1):
-        source = s[i]
+        source = str.lower(source[-1] + s[i])
         destLetter = s[i+1]
         build_transition(source, destLetter)
-    build_transition(s[-1], '$')
+    build_transition(s[-2:], '$')
 
 
 def potential_new_vector(currentVec, sourceVec):
@@ -61,6 +61,6 @@ def score(goalVector, currentVec, currentTotal, destNode):
 
 def find_next_transition(sourceLetter, currentVec, currentTotal, goalVector):
     return min(
-        all_transitions[sourceLetter],
+        all_transitions[str.lower(sourceLetter)],
         key=lambda n: score(goalVector, currentVec, currentTotal, n)
     )

@@ -5,14 +5,14 @@ while True:
     userWord = nlp(input('Word to be similar to: '))
     goalVector = userWord.vector
     # [print(x['letter'] + ': ', score(userWord, x)) for x in all_transitions['$']]
-    champion = find_next_transition('$', 0, 0, goalVector)
+    champion = find_next_transition('$$', 0, 0, goalVector)
     # print('letter: ', champion['letter'], 'mass: ', champion['mass'])
     ieration = 1
     currentVec = 0
     fakeWord = champion['letter']
+    sourceLetters = '$' + fakeWord
     while champion['letter'] != '$' and ieration <20:
-        sourceLetter = champion['letter']
-        champion = find_next_transition(sourceLetter, currentVec, ieration, goalVector)
+        champion = find_next_transition(sourceLetters, currentVec, ieration, goalVector)
         if champion is None:
             print('cannot make word')
             break
@@ -24,4 +24,5 @@ while True:
         fakeWord += champion['letter']
         # print('letter: ', champion['letter'], 'mass: ', champion['mass'])
         ieration += 1
+        sourceLetters = fakeWord[-2:]
     print('new word: ', fakeWord[:-1])
