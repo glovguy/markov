@@ -1,4 +1,5 @@
 import pickle
+from tqdm import tqdm
 import spacy
 from src.markov import stack_markov, regular_markov
 from src.plagiarism.plagiarism import build_plagiarism_trie

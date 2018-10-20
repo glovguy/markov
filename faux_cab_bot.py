@@ -1,4 +1,4 @@
-from src.made_up_words.made_up_words import *
+from src.faux_cab.faux_cab import *
 
 
 def generate_fake_word(goalVector, ignore=[]):
@@ -33,7 +33,7 @@ while True:
     goalVector = userWord.vector
     fakeWord = generate_fake_word(goalVector)
     ignoreStrs = []
-    while fakeWord in all_strings:
+    while fakeWord in all_strings or fakeWord.lower() in all_strings:
         print('generated real word "{}", retrying...'.format(fakeWord))
         ignoreStrs.append(fakeWord)
         fakeWord = generate_fake_word(goalVector, ignoreStrs)
